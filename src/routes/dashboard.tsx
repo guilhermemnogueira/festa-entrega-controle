@@ -135,7 +135,11 @@ function DashboardPage() {
       </div>
 
       {!mounted ? (
-        <div className="text-sm text-muted-ink py-12 text-center">Carregando indicadores…</div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ChartSkeleton key={i} />
+          ))}
+        </div>
       ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
