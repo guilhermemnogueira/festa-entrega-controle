@@ -30,7 +30,8 @@ const AZUL = {
 function DashboardPage() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [mes, setMes] = useState(mesRefAtual());
-  useEffect(() => { setClientes(loadClientes()); }, []);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setClientes(loadClientes()); setMounted(true); }, []);
 
   const doMes = useMemo(() => clientes.filter((c) => c.mesRef === mes), [clientes, mes]);
   const mesNum = mesNumero(mes);
