@@ -241,6 +241,8 @@ function DashboardPage() {
           )}
         </Card>
       </div>
+      )}
+    </Layout>
     </Layout>
   );
 }
