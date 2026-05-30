@@ -3,7 +3,7 @@ export const brl = (n: number) =>
 
 export function idade(nascimento: string): number {
   if (!nascimento) return 0;
-  const n = new Date(nascimento);
+  const n = new Date(nascimento + "T00:00:00");
   const hoje = new Date();
   let a = hoje.getFullYear() - n.getFullYear();
   const m = hoje.getMonth() - n.getMonth();

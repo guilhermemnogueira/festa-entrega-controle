@@ -40,7 +40,8 @@ export function ClientModal({ open, initial, onClose, onSave, onDelete }: Props)
 
   useEffect(() => {
     if (open) {
-      setC({ ...empty, ...initial, id: initial?.id || newId() } as Cliente);
+      const today = new Date().toISOString().slice(0, 10);
+      setC({ ...empty, dataPedido: today, mesRef: mesRefAtual(), ...initial, id: initial?.id || newId() } as Cliente);
       setAskDelete(false);
     }
   }, [open, initial]);

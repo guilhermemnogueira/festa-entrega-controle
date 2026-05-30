@@ -47,11 +47,10 @@ function ClientesPage() {
       return true;
     });
     arr.sort((a, b) => {
-      const k = sort.key;
-      const av = a[k] as any, bv = b[k] as any;
-      if (av < bv) return sort.dir === "asc" ? -1 : 1;
-      if (av > bv) return sort.dir === "asc" ? 1 : -1;
-      return 0;
+      const av = a[sort.key] as string | number;
+      const bv = b[sort.key] as string | number;
+      const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+      return sort.dir === "asc" ? cmp : -cmp;
     });
     return arr;
   }, [clientes, busca, fMes, fBairro, fPag, fTipo, fMod, sort]);
@@ -78,8 +77,10 @@ function ClientesPage() {
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `clientes-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
-    URL.revokeObjectURL(url);
+    a.href = url;
+    a.download = `clientes-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.addEventListener("click", () => setTimeout(() => URL.revokeObjectURL(url), 10_000), { once: true });
+    a.click();
     toast.success("CSV exportado");
   }
 

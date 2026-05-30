@@ -1,13 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-  PieChart, Pie, Cell, Legend,
-} from "recharts";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { loadClientes } from "@/lib/storage";
 import type { Cliente } from "@/lib/types";
-import { brl, idade, listaMeses, mesDeNascimento, mesNumero, mesRefAtual } from "@/lib/format";
+import { listaMeses, mesRefAtual } from "@/lib/format";
+
+const DashboardCharts = lazy(() => import("@/components/DashboardCharts"));
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -19,96 +17,11 @@ export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
 });
 
-const AZUL = {
-  dark: "#0b1f3a",
-  mid: "#1e3d6e",
-  light: "#6b9fd4",
-  pale: "#a8c2e3",
-  paler: "#c5d5e8",
-};
-
 function DashboardPage() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [mes, setMes] = useState(mesRefAtual());
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setClientes(loadClientes()); setMounted(true); }, []);
-
-  const doMes = useMemo(() => clientes.filter((c) => c.mesRef === mes), [clientes, mes]);
-  const mesNum = mesNumero(mes);
-
-  const totalClientes = clientes.length;
-  const faturamento = doMes.reduce((s, c) => s + c.valor, 0);
-  const ticket = doMes.length ? faturamento / doMes.length : 0;
-  const entregas = doMes.filter((c) => c.modalidade === "Entrega").length;
-  const retiradas = doMes.filter((c) => c.modalidade === "Retirada").length;
-  const recorrentes = doMes.filter((c) => c.status === "Recorrente").length;
-  const aniver = clientes.filter((c) => mesDeNascimento(c.nascimento) === mesNum).length;
-
-  const faturamentoMes = useMemo(() => {
-    const meses = listaMeses().slice().reverse();
-    return meses.map((m) => ({
-      mes: m.label.slice(0, 3),
-      valor: clientes.filter((c) => c.mesRef === m.value).reduce((s, c) => s + c.valor, 0),
-    }));
-  }, [clientes]);
-
-  const bairrosData = useMemo(() => {
-    const map = new Map<string, number>();
-    doMes.forEach((c) => map.set(c.bairro || "—", (map.get(c.bairro || "—") || 0) + 1));
-    return Array.from(map.entries()).map(([nome, qtd]) => ({ nome, qtd })).sort((a, b) => b.qtd - a.qtd).slice(0, 8);
-  }, [doMes]);
-
-  const pagamentosData = useMemo(() => {
-    const map = new Map<string, number>();
-    doMes.forEach((c) => map.set(c.pagamento, (map.get(c.pagamento) || 0) + 1));
-    return Array.from(map.entries()).map(([name, value]) => ({ name, value }));
-  }, [doMes]);
-
-  const motivosData = useMemo(() => {
-    const map = new Map<string, number>();
-    doMes.forEach((c) => { if (c.motivo) map.set(c.motivo, (map.get(c.motivo) || 0) + 1); });
-    return Array.from(map.entries()).map(([nome, qtd]) => ({ nome, qtd })).sort((a, b) => b.qtd - a.qtd).slice(0, 6);
-  }, [doMes]);
-
-  const faixasData = useMemo(() => {
-    const faixas = [
-      { nome: "18-25", min: 18, max: 25 },
-      { nome: "26-35", min: 26, max: 35 },
-      { nome: "36-45", min: 36, max: 45 },
-      { nome: "46-60", min: 46, max: 60 },
-      { nome: "60+", min: 61, max: 200 },
-    ];
-    return faixas.map((f) => ({ nome: f.nome, qtd: doMes.filter((c) => { const a = idade(c.nascimento); return a >= f.min && a <= f.max; }).length }));
-  }, [doMes]);
-
-  const sexoData = useMemo(() => {
-    const map = new Map<string, number>();
-    doMes.forEach((c) => map.set(c.sexo, (map.get(c.sexo) || 0) + 1));
-    return Array.from(map.entries()).map(([name, value]) => ({ name, value }));
-  }, [doMes]);
-
-  const cxlData = useMemo(() => {
-    const meses = listaMeses().slice().reverse();
-    return meses.map((m) => {
-      const arr = clientes.filter((c) => c.mesRef === m.value);
-      return {
-        mes: m.label.slice(0, 3),
-        compras: arr.filter((c) => c.tipo === "Compra" || c.tipo === "Ambos").length,
-        locacoes: arr.filter((c) => c.tipo === "Locacao" || c.tipo === "Ambos").length,
-      };
-    });
-  }, [clientes]);
-
-  const ranking = useMemo(() => {
-    const map = new Map<string, number>();
-    doMes.forEach((c) => {
-      [c.comprou, c.alugou].forEach((txt) => {
-        if (!txt) return;
-        txt.split(/,|;/).forEach((p) => { const k = p.trim(); if (k) map.set(k, (map.get(k) || 0) + 1); });
-      });
-    });
-    return Array.from(map.entries()).map(([nome, qtd]) => ({ nome, qtd })).sort((a, b) => b.qtd - a.qtd).slice(0, 8);
-  }, [doMes]);
 
   return (
     <Layout>
@@ -125,156 +38,152 @@ function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-        <Kpi label="Total de clientes" value={totalClientes.toString()} />
-        <Kpi label="Faturamento do mês" value={brl(faturamento)} />
-        <Kpi label="Ticket médio" value={brl(ticket)} />
-        <Kpi label="Entregas / Retiradas" value={`${entregas} / ${retiradas}`} />
-        <Kpi label="Recorrentes" value={recorrentes.toString()} />
-        <Kpi label="Aniversariantes" value={aniver.toString()} />
-      </div>
-
-      {!mounted ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <ChartSkeleton key={i} />
-          ))}
-        </div>
+      {mounted ? (
+        <Suspense fallback={<DashboardSkeletons />}>
+          <DashboardCharts clientes={clientes} mes={mes} />
+        </Suspense>
       ) : (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-        <Card title="Faturamento por mês">
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={faturamentoMes}>
-              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.paler} />
-              <XAxis dataKey="mes" stroke={AZUL.mid} fontSize={12} />
-              <YAxis stroke={AZUL.mid} fontSize={12} />
-              <Tooltip formatter={(v: number) => brl(v)} />
-              <Bar dataKey="valor" fill={AZUL.mid} radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-
-        <Card title="Top bairros">
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={bairrosData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.paler} />
-              <XAxis type="number" stroke={AZUL.mid} fontSize={12} />
-              <YAxis dataKey="nome" type="category" stroke={AZUL.mid} fontSize={12} width={100} />
-              <Tooltip />
-              <Bar dataKey="qtd" fill={AZUL.light} radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-
-        <Card title="Formas de pagamento">
-          <ResponsiveContainer width="100%" height={260}>
-            <PieChart>
-              <Pie data={pagamentosData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90}>
-                {pagamentosData.map((_, i) => <Cell key={i} fill={[AZUL.dark, AZUL.mid, AZUL.light, AZUL.pale, AZUL.paler][i % 5]} />)}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </Card>
-
-        <Card title="Motivos mais frequentes">
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={motivosData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.paler} />
-              <XAxis type="number" stroke={AZUL.mid} fontSize={12} />
-              <YAxis dataKey="nome" type="category" stroke={AZUL.mid} fontSize={11} width={130} />
-              <Tooltip />
-              <Bar dataKey="qtd" fill={AZUL.mid} radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-
-        <Card title="Distribuição por faixa etária">
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={faixasData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.paler} />
-              <XAxis dataKey="nome" stroke={AZUL.mid} fontSize={12} />
-              <YAxis stroke={AZUL.mid} fontSize={12} />
-              <Tooltip />
-              <Bar dataKey="qtd" fill={AZUL.dark} radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-
-        <Card title="Distribuição por sexo">
-          <ResponsiveContainer width="100%" height={260}>
-            <PieChart>
-              <Pie data={sexoData} dataKey="value" nameKey="name" outerRadius={90} label>
-                {sexoData.map((_, i) => <Cell key={i} fill={[AZUL.mid, AZUL.light, AZUL.dark][i % 3]} />)}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </Card>
-
-        <Card title="Compras vs Locações por mês">
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={cxlData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.paler} />
-              <XAxis dataKey="mes" stroke={AZUL.mid} fontSize={12} />
-              <YAxis stroke={AZUL.mid} fontSize={12} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="compras" fill={AZUL.dark} radius={[4, 4, 0, 0]} />
-              <Bar dataKey="locacoes" fill={AZUL.light} radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-
-        <Card title="Ranking de produtos">
-          {ranking.length === 0 ? (
-            <p className="text-sm text-muted-ink py-8 text-center">Sem dados no período</p>
-          ) : (
-            <ul className="space-y-2">
-              {ranking.map((r, i) => (
-                <li key={r.nome} className="flex items-center gap-3 p-2 rounded hover:bg-surface">
-                  <span className="h-7 w-7 rounded-md bg-brand text-white text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
-                  <span className="flex-1 text-sm text-foreground truncate">{r.nome}</span>
-                  <span className="text-xs font-semibold text-muted-ink">{r.qtd}x</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-      </div>
+        <DashboardSkeletons />
       )}
     </Layout>
   );
 }
 
-function Kpi({ label, value }: { label: string; value: string }) {
+/* ── Skeleton layout ─────────────────────────────────────────────────── */
+
+function DashboardSkeletons() {
   return (
-    <div className="bg-white border border-navy/20 rounded-lg p-4">
-      <div className="text-xs text-muted-ink mb-1">{label}</div>
-      <div className="text-xl font-bold text-foreground">{value}</div>
+    <>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+        {Array.from({ length: 6 }).map((_, i) => <KpiSkeleton key={i} />)}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <BarChartSkeleton title="Faturamento por mês" count={12} />
+        <HBarChartSkeleton title="Top bairros" count={6} />
+        <PieSkeleton title="Formas de pagamento" slices={4} />
+        <HBarChartSkeleton title="Motivos mais frequentes" count={5} />
+        <BarChartSkeleton title="Distribuição por faixa etária" count={5} />
+        <PieSkeleton title="Distribuição por sexo" slices={3} />
+        <BarChartSkeleton title="Compras vs Locações por mês" count={12} grouped />
+        <RankingSkeleton />
+      </div>
+    </>
+  );
+}
+
+/* ── Skeleton components ─────────────────────────────────────────────── */
+
+function KpiSkeleton() {
+  return (
+    <div className="bg-white border border-navy/20 rounded-lg p-4 animate-pulse">
+      <div className="h-3 w-24 bg-surface rounded mb-3" />
+      <div className="h-6 w-20 bg-[#dce7f5] rounded" />
     </div>
   );
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-white border border-divider rounded-lg p-4">
-      <h3 className="text-sm font-semibold text-foreground mb-3">{title}</h3>
-      {children}
-    </div>
-  );
-}
+const BAR_HEIGHTS = [55, 88, 48, 108, 72, 128, 82, 100, 60, 92, 68, 112];
 
-function ChartSkeleton() {
+function BarChartSkeleton({ title, count, grouped = false }: { title: string; count: number; grouped?: boolean }) {
+  const bars = BAR_HEIGHTS.slice(0, count);
   return (
     <div className="bg-white border border-divider rounded-lg p-4 animate-pulse">
-      <div className="h-4 w-40 bg-surface rounded mb-4" />
-      <div className="h-[260px] bg-surface rounded flex items-end gap-2 p-3">
-        {[60, 90, 45, 110, 75, 130, 80, 100].map((h, i) => (
-          <div key={i} className="flex-1 bg-divider rounded" style={{ height: `${h}px` }} />
+      <div className="h-4 w-36 bg-surface rounded mb-1" />
+      <div className="relative mt-5">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="absolute left-0 right-0 border-t border-[#eef2f7]" style={{ bottom: `${28 + i * 48}px` }} />
+        ))}
+        <div className="flex items-end gap-1 h-[222px] pb-7">
+          {bars.map((h, i) => (
+            <div key={i} className="flex-1 flex items-end gap-px">
+              <div className="flex-1 bg-[#1e3d6e]/20 rounded-t transition-none" style={{ height: h }} />
+              {grouped && <div className="flex-1 bg-[#6b9fd4]/35 rounded-t" style={{ height: Math.round(h * 0.55) }} />}
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-1">
+          {bars.map((_, i) => (
+            <div key={i} className="flex-1 h-2.5 bg-surface rounded" />
+          ))}
+        </div>
+        {grouped && (
+          <div className="flex items-center gap-4 mt-3 justify-center">
+            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[#1e3d6e]/20" /><div className="w-14 h-2.5 bg-surface rounded" /></div>
+            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-[#6b9fd4]/35" /><div className="w-14 h-2.5 bg-surface rounded" /></div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const HBAR_WIDTHS = [88, 62, 76, 48, 92, 55, 40, 70];
+
+function HBarChartSkeleton({ title, count }: { title: string; count: number }) {
+  const rows = HBAR_WIDTHS.slice(0, count);
+  const rowH = Math.floor(260 / count);
+  return (
+    <div className="bg-white border border-divider rounded-lg p-4 animate-pulse">
+      <div className="h-4 w-28 bg-surface rounded mb-3" />
+      <div className="flex flex-col justify-between" style={{ height: 260 }}>
+        {rows.map((w, i) => (
+          <div key={i} className="flex items-center gap-3" style={{ height: rowH - 6 }}>
+            <div className="shrink-0 h-3 bg-surface rounded" style={{ width: i % 2 === 0 ? 80 : 100 }} />
+            <div className="h-5 bg-[#1e3d6e]/20 rounded-r" style={{ width: `${w}%` }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const LEGEND_WIDTHS = [72, 56, 84, 48, 66];
+
+function PieSkeleton({ title, slices }: { title: string; slices: number }) {
+  const legend = LEGEND_WIDTHS.slice(0, slices);
+  return (
+    <div className="bg-white border border-divider rounded-lg p-4 animate-pulse">
+      <div className="h-4 w-32 bg-surface rounded mb-2" />
+      <div className="flex flex-col items-center justify-center gap-5" style={{ height: 260 }}>
+        <div className="relative w-44 h-44 shrink-0">
+          <div className="w-full h-full rounded-full bg-[#1e3d6e]/18" />
+          <div className="absolute rounded-full bg-white" style={{ inset: 42 }} />
+          <div
+            className="absolute rounded-full border-[18px] border-transparent"
+            style={{
+              inset: 14,
+              borderTopColor: "#dce7f5",
+              borderRightColor: "#a8c2e3",
+              transform: "rotate(-30deg)",
+            }}
+          />
+        </div>
+        <div className="flex flex-wrap justify-center gap-x-5 gap-y-2">
+          {legend.map((w, i) => (
+            <div key={i} className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-sm bg-[#dce7f5]" />
+              <div className="h-2.5 bg-surface rounded" style={{ width: w }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const RANK_WIDTHS = [86, 70, 92, 58, 78, 52, 82, 66];
+
+function RankingSkeleton() {
+  return (
+    <div className="bg-white border border-divider rounded-lg p-4 animate-pulse">
+      <div className="h-4 w-32 bg-surface rounded mb-4" />
+      <div className="space-y-1">
+        {RANK_WIDTHS.map((w, i) => (
+          <div key={i} className="flex items-center gap-3 px-2 py-1.5 rounded">
+            <div className="h-7 w-7 rounded-md bg-[#1e3d6e]/20 shrink-0" />
+            <div className="flex-1 h-3 bg-surface rounded" style={{ maxWidth: `${w}%` }} />
+            <div className="w-7 h-3 bg-[#dce7f5] rounded" />
+          </div>
         ))}
       </div>
     </div>

@@ -31,10 +31,8 @@ function KanbanPage() {
   const mesAtualNum = mesNumero(mes);
 
   const byCol = useMemo(() => {
-    const map: Record<StatusKanban, Cliente[]> = {
-      "Novo Contato": [], "Pedido Realizado": [], "Em Entrega / Retirada": [], "Concluído": [], "Recorrente": [],
-    };
-    filtered.forEach((c) => map[c.status].push(c));
+    const map = Object.fromEntries(STATUS_LIST.map((s) => [s, [] as Cliente[]])) as Record<StatusKanban, Cliente[]>;
+    filtered.forEach((c) => { map[c.status]?.push(c); });
     return map;
   }, [filtered]);
 
@@ -51,6 +49,12 @@ function KanbanPage() {
 
   function onDropTo(col: StatusKanban) {
     if (!dragId) return;
+    const target = clientes.find((c) => c.id === dragId);
+    if (!target || target.status === col) {
+      setDragId(null);
+      setOverCol(null);
+      return;
+    }
     setClientes((prev) => updateStatus(prev, dragId, col));
     toast.success(`Movido para "${col}"`);
     setDragId(null);
