@@ -134,7 +134,11 @@ function DashboardPage() {
         <Kpi label="Aniversariantes" value={aniver.toString()} />
       </div>
 
+      {!mounted ? (
+        <div className="text-sm text-muted-ink py-12 text-center">Carregando indicadores…</div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
         <Card title="Faturamento por mês">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={faturamentoMes}>
