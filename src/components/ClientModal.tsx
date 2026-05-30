@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { X, Trash2 } from "lucide-react";
 import type { Cliente, StatusKanban } from "@/lib/types";
 import { STATUS_LIST } from "@/lib/types";
@@ -190,5 +190,3 @@ function Field({ label, children, required, full }: { label: string; children: R
     </div>
   );
 }
-
-type ReactNode = React.ReactNode;
