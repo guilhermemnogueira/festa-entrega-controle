@@ -243,7 +243,6 @@ function DashboardPage() {
       </div>
       )}
     </Layout>
-    </Layout>
   );
 }
 
