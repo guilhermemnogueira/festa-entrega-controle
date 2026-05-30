@@ -30,7 +30,8 @@ const AZUL = {
 function DashboardPage() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [mes, setMes] = useState(mesRefAtual());
-  useEffect(() => { setClientes(loadClientes()); }, []);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setClientes(loadClientes()); setMounted(true); }, []);
 
   const doMes = useMemo(() => clientes.filter((c) => c.mesRef === mes), [clientes, mes]);
   const mesNum = mesNumero(mes);
@@ -133,7 +134,11 @@ function DashboardPage() {
         <Kpi label="Aniversariantes" value={aniver.toString()} />
       </div>
 
+      {!mounted ? (
+        <div className="text-sm text-muted-ink py-12 text-center">Carregando indicadores…</div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
         <Card title="Faturamento por mês">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={faturamentoMes}>
@@ -236,6 +241,7 @@ function DashboardPage() {
           )}
         </Card>
       </div>
+      )}
     </Layout>
   );
 }
