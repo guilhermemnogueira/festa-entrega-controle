@@ -15,9 +15,8 @@ export function Layout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background flex flex-col">
       <header className="bg-navy text-white sticky top-0 z-30 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-6 py-3 flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2 font-bold text-lg tracking-tight">
+          <Link to="/" aria-label="Início" className="flex items-center">
             <Wine className="h-6 w-6" />
-            <span>BevCRM</span>
           </Link>
           <nav className="flex items-center gap-1">
             {tabs.map((t) => {
