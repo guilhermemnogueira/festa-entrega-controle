@@ -135,7 +135,11 @@ function DashboardPage() {
       </div>
 
       {!mounted ? (
-        <div className="text-sm text-muted-ink py-12 text-center">Carregando indicadores…</div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ChartSkeleton key={i} />
+          ))}
+        </div>
       ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
@@ -260,6 +264,19 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
     <div className="bg-white border border-divider rounded-lg p-4">
       <h3 className="text-sm font-semibold text-foreground mb-3">{title}</h3>
       {children}
+    </div>
+  );
+}
+
+function ChartSkeleton() {
+  return (
+    <div className="bg-white border border-divider rounded-lg p-4 animate-pulse">
+      <div className="h-4 w-40 bg-surface rounded mb-4" />
+      <div className="h-[260px] bg-surface rounded flex items-end gap-2 p-3">
+        {[60, 90, 45, 110, 75, 130, 80, 100].map((h, i) => (
+          <div key={i} className="flex-1 bg-divider rounded" style={{ height: `${h}px` }} />
+        ))}
+      </div>
     </div>
   );
 }
