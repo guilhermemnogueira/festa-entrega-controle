@@ -267,3 +267,16 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
     </div>
   );
 }
+
+function ChartSkeleton() {
+  return (
+    <div className="bg-white border border-divider rounded-lg p-4 animate-pulse">
+      <div className="h-4 w-40 bg-surface rounded mb-4" />
+      <div className="h-[260px] bg-surface rounded flex items-end gap-2 p-3">
+        {[60, 90, 45, 110, 75, 130, 80, 100].map((h, i) => (
+          <div key={i} className="flex-1 bg-divider rounded" style={{ height: `${h}px` }} />
+        ))}
+      </div>
+    </div>
+  );
+}
