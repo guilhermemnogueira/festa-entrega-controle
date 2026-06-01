@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutGrid, Users, BarChart3, Wine } from "lucide-react";
-import type { ReactNode } from "react";
+import { LayoutGrid, Users, BarChart3, Wine, Wifi, WifiOff } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "sonner";
 
 const tabs = [
@@ -8,6 +8,36 @@ const tabs = [
   { to: "/clientes", label: "Clientes", icon: Users },
   { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
 ];
+
+function ConnectivityBadge() {
+  const [online, setOnline] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    setOnline(navigator.onLine);
+    const on = () => setOnline(true);
+    const off = () => setOnline(false);
+    window.addEventListener("online", on);
+    window.addEventListener("offline", off);
+    return () => {
+      window.removeEventListener("online", on);
+      window.removeEventListener("offline", off);
+    };
+  }, []);
+  if (!mounted) return null;
+  return (
+    <div
+      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+        online ? "bg-emerald-500/15 text-emerald-200" : "bg-red-500/20 text-red-100"
+      }`}
+      title={online ? "Conectado" : "Sem conexão — operando offline"}
+      aria-live="polite"
+    >
+      {online ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
+      {online ? "Online" : "Offline"}
+    </div>
+  );
+}
 
 export function Layout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
