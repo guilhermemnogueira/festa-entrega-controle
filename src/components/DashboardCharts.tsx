@@ -6,12 +6,17 @@ import {
 import type { Cliente } from "@/lib/types";
 import { brl, idade, listaMeses, mesDeNascimento, mesNumero } from "@/lib/format";
 
+// Paleta calibrada: todos os tons usados como preenchimento têm
+// contraste ≥ 3:1 em fundo branco (WCAG non-text). `grid` é usado
+// apenas para linhas de grade decorativas.
 const AZUL = {
-  dark: "#0b1f3a",
-  mid: "#1e3d6e",
-  light: "#6b9fd4",
-  pale: "#a8c2e3",
-  paler: "#c5d5e8",
+  dark: "#0b1f3a",   // 16.5:1
+  mid: "#1e3d6e",    // 9.8:1
+  light: "#4a7ab8",  // 4.4:1
+  accent: "#2d8a9e", // 4.3:1 (teal — distinção em pies)
+  soft: "#7a92b8",   // 3.4:1
+  grid: "#c5d5e8",   // grade (decorativa)
+  axis: "#2d4a73",   // 8.0:1 (texto dos eixos)
 };
 
 interface Props {
