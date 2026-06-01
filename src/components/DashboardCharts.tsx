@@ -135,7 +135,7 @@ export default function DashboardCharts({ clientes, mes }: Props) {
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={pagamentosData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90} isAnimationActive={false}>
-                {pagamentosData.map((_, i) => <Cell key={i} fill={[AZUL.dark, AZUL.mid, AZUL.accent, AZUL.light, AZUL.soft][i % 5]} />)}
+                {pagamentosData.map((_, i) => <Cell key={i} fill={[AZUL.dark, AZUL.mid, AZUL.accent, AZUL.light, AZUL.soft][i % 5]} stroke="#fff" strokeWidth={2} />)}
               </Pie>
               <Tooltip />
               <Legend />
@@ -171,7 +171,7 @@ export default function DashboardCharts({ clientes, mes }: Props) {
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={sexoData} dataKey="value" nameKey="name" outerRadius={90} label isAnimationActive={false}>
-                {sexoData.map((_, i) => <Cell key={i} fill={[AZUL.mid, AZUL.light, AZUL.dark][i % 3]} />)}
+                {sexoData.map((_, i) => <Cell key={i} fill={[AZUL.mid, AZUL.light, AZUL.dark][i % 3]} stroke="#fff" strokeWidth={2} />)}
               </Pie>
               <Tooltip />
               <Legend />
