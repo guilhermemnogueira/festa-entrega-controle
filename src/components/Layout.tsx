@@ -48,7 +48,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <Link to="/" aria-label="Início" className="flex items-center">
             <Wine className="h-6 w-6" />
           </Link>
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-1 flex-1">
             {tabs.map((t) => {
               const active = pathname === t.to;
               const Icon = t.icon;
@@ -66,6 +66,7 @@ export function Layout({ children }: { children: ReactNode }) {
               );
             })}
           </nav>
+          <ConnectivityBadge />
         </div>
       </header>
       <main className="flex-1 max-w-[1400px] w-full mx-auto px-6 py-6">{children}</main>
