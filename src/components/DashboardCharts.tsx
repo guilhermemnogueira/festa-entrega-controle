@@ -110,9 +110,9 @@ export default function DashboardCharts({ clientes, mes }: Props) {
         <Card title="Faturamento por mês">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={porMes}>
-              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.paler} />
-              <XAxis dataKey="mes" stroke={AZUL.mid} fontSize={12} />
-              <YAxis stroke={AZUL.mid} fontSize={12} />
+              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.grid} />
+              <XAxis dataKey="mes" stroke={AZUL.axis} fontSize={12} />
+              <YAxis stroke={AZUL.axis} fontSize={12} />
               <Tooltip formatter={(v: number) => brl(v)} />
               <Bar dataKey="valor" fill={AZUL.mid} radius={[4, 4, 0, 0]}  isAnimationActive={false} />
             </BarChart>
@@ -122,9 +122,9 @@ export default function DashboardCharts({ clientes, mes }: Props) {
         <Card title="Top bairros">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={bairrosData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.paler} />
-              <XAxis type="number" stroke={AZUL.mid} fontSize={12} />
-              <YAxis dataKey="nome" type="category" stroke={AZUL.mid} fontSize={12} width={100} />
+              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.grid} />
+              <XAxis type="number" stroke={AZUL.axis} fontSize={12} />
+              <YAxis dataKey="nome" type="category" stroke={AZUL.axis} fontSize={12} width={100} />
               <Tooltip />
               <Bar dataKey="qtd" fill={AZUL.light} radius={[0, 4, 4, 0]}  isAnimationActive={false} />
             </BarChart>
@@ -135,7 +135,7 @@ export default function DashboardCharts({ clientes, mes }: Props) {
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={pagamentosData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90} isAnimationActive={false}>
-                {pagamentosData.map((_, i) => <Cell key={i} fill={[AZUL.dark, AZUL.mid, AZUL.light, AZUL.pale, AZUL.paler][i % 5]} />)}
+                {pagamentosData.map((_, i) => <Cell key={i} fill={[AZUL.dark, AZUL.mid, AZUL.accent, AZUL.light, AZUL.soft][i % 5]} />)}
               </Pie>
               <Tooltip />
               <Legend />
@@ -146,9 +146,9 @@ export default function DashboardCharts({ clientes, mes }: Props) {
         <Card title="Motivos mais frequentes">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={motivosData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.paler} />
-              <XAxis type="number" stroke={AZUL.mid} fontSize={12} />
-              <YAxis dataKey="nome" type="category" stroke={AZUL.mid} fontSize={11} width={130} />
+              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.grid} />
+              <XAxis type="number" stroke={AZUL.axis} fontSize={12} />
+              <YAxis dataKey="nome" type="category" stroke={AZUL.axis} fontSize={11} width={130} />
               <Tooltip />
               <Bar dataKey="qtd" fill={AZUL.mid} radius={[0, 4, 4, 0]}  isAnimationActive={false} />
             </BarChart>
@@ -158,9 +158,9 @@ export default function DashboardCharts({ clientes, mes }: Props) {
         <Card title="Distribuição por faixa etária">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={faixasData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.paler} />
-              <XAxis dataKey="nome" stroke={AZUL.mid} fontSize={12} />
-              <YAxis stroke={AZUL.mid} fontSize={12} />
+              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.grid} />
+              <XAxis dataKey="nome" stroke={AZUL.axis} fontSize={12} />
+              <YAxis stroke={AZUL.axis} fontSize={12} />
               <Tooltip />
               <Bar dataKey="qtd" fill={AZUL.dark} radius={[4, 4, 0, 0]}  isAnimationActive={false} />
             </BarChart>
@@ -182,9 +182,9 @@ export default function DashboardCharts({ clientes, mes }: Props) {
         <Card title="Compras vs Locações por mês">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={porMes}>
-              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.paler} />
-              <XAxis dataKey="mes" stroke={AZUL.mid} fontSize={12} />
-              <YAxis stroke={AZUL.mid} fontSize={12} />
+              <CartesianGrid strokeDasharray="3 3" stroke={AZUL.grid} />
+              <XAxis dataKey="mes" stroke={AZUL.axis} fontSize={12} />
+              <YAxis stroke={AZUL.axis} fontSize={12} />
               <Tooltip />
               <Legend />
               <Bar dataKey="compras" fill={AZUL.dark} radius={[4, 4, 0, 0]}  isAnimationActive={false} />
