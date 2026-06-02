@@ -11,7 +11,7 @@ import { brl, listaMeses, mesNumero, mesRefAtual, mesDeNascimento } from "@/lib/
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Clientes Mensais — BevCRM" },
+      { title: "Cadastros dos Clientes — BevCRM" },
       { name: "description", content: "Acompanhe o fluxo mensal de atendimento de clientes." },
     ],
   }),
