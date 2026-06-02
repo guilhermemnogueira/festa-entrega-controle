@@ -11,7 +11,7 @@ import { brl, listaMeses, mesNumero, mesRefAtual, mesDeNascimento } from "@/lib/
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Kanban Mensal — BevCRM" },
+      { title: "Clientes Mensais — BevCRM" },
       { name: "description", content: "Acompanhe o fluxo mensal de atendimento de clientes." },
     ],
   }),
@@ -65,7 +65,7 @@ function KanbanPage() {
     <Layout>
       <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Kanban Mensal</h1>
+          <h1 className="text-2xl font-bold text-foreground">Clientes Mensais</h1>
           <p className="text-sm text-muted-ink">Arraste os cards entre as colunas para atualizar o status</p>
         </div>
         <div className="flex items-center gap-3">
