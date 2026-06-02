@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "sonner";
 
 const tabs = [
-  { to: "/", label: "Kanban", icon: LayoutGrid },
+  { to: "/", label: "Clientes Mensais", icon: LayoutGrid },
   { to: "/clientes", label: "Clientes", icon: Users },
   { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
 ];
